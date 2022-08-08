@@ -1,0 +1,71 @@
+
+[mesa]
+apt install libunwind-dev libelf-dev libwayland-dev wayland-protocols libxdamage-dev libxcb-glx0-dev libxcb-shm0-dev libx11-xcb-dev libxcb-dri2-0-dev libxcb-dri3-dev libxcb-present-dev libxshmfence-dev libxxf86vm-dev 
+pip3 install meson
+pip3 install ninja
+
+cd mesa-22.1.5
+mkdir build && cd build
+
+meson setup \
+  --buildtype release \
+  --backend ninja \
+  --prefix /opt/opengl \
+  -Dosmesa=true \
+  -Dvalgrind=disabled
+
+ninja -j8
+ninja install
+
+
+[mesa-glu]
+cd glu-9.0.2
+mkdir build && cd build
+
+meson setup \
+  --prefix=/opt/opengl \
+  --buildtype=release \
+  -Dgl_provider=gl
+
+ninja -j8
+ninja install
+
+
+[freeglut]
+apt-get install libx11-dev ................. for X11/Xlib.h
+apt-get install libxi-dev .................. for X11/extensions/XInput.h
+apt-get install libxrandr-dev .............. for X11/extensions/Xrandr.h
+
+cd freeglut-3.2.2
+mkdir build && cd build
+
+cmake -Wno-dev \
+  -DCMAKE_INSTALL_PREFIX=/opt/opengl \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DFREEGLUT_BUILD_DEMOS=OFF \
+  -DOPENGL_INCLUDE_DIR=/opt/opengl/include \
+  -DOPENGL_gl_LIBRARY=/opt/opengl/lib/x86_64-linux-gnu/libGL.so \
+  ..
+
+make -j8
+make install
+<mv lib/*.so to lib/x86_64-linux-gnu>
+
+
+[glew]
+cd glew-2.2.0/build/cmake
+mkdir build && cd build
+
+cmake -Wno-dev \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/opt/opengl \
+  -DOPENGL_INCLUDE_DIR=/opt/opengl/include \
+  -DOPENGL_gl_LIBRARY=/opt/opengl/lib/x86_64-linux-gnu/libGL.so \
+  ..
+
+make -j8
+make install
+<mv lib/*.so to lib/x86_64-linux-gnu>
+
+
+
