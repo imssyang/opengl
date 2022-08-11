@@ -68,4 +68,17 @@ make install
 <mv lib/*.so to lib/x86_64-linux-gnu>
 
 
+[glfw3]
+apt install libxinerama-dev
+
+cd glfw-3.3.8
+mkdir build && cd build
+
+cmake -Wno-dev \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/opt/opengl/glfw \
+  -DBUILD_SHARED_LIBS=ON \
+
+
+
 
