@@ -69,15 +69,16 @@ make install
 
 
 [glfw3]
-apt install libxinerama-dev
+apt install libxinerama-dev libxcursor-dev
 
 cd glfw-3.3.8
 mkdir build && cd build
 
 cmake -Wno-dev \
   -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/opt/opengl/glfw \
+  -DCMAKE_INSTALL_PREFIX=/opt/opengl \
   -DBUILD_SHARED_LIBS=ON \
+  ..
 
 
 
