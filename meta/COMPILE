@@ -81,5 +81,11 @@ cmake -Wno-dev \
   ..
 
 
+[glad-core]
+https://glad.dav1d.de/
 
+glad-core.zip
+- cpp-opengl-core-gl4.6-gles1.1.0-gles2.3.2-glsc2.2.0
+
+gcc -o libglad.so -fPIC -shared src/glad.c -I/opt/opengl/include 
 

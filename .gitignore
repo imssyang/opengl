@@ -2,4 +2,5 @@ archive
 bin
 include
 lib
+sample/tutorial/**/out/
 share
