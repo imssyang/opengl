@@ -2,10 +2,13 @@ CC := g++
 CFLAGS := -I/opt/opengl/include
 LDFLAGS := -L/opt/opengl/lib/x86_64-linux-gnu -lglad -lglfw -ldl
 
-all: hello_window
+all: triangle rectangle
 
-hello_window: prepare
+triangle: prepare
 	$(CC) -o out/triangle triangle.cpp $(CFLAGS) $(LDFLAGS)
+
+rectangle: prepare
+	$(CC) -o out/rectangle rectangle.cpp $(CFLAGS) $(LDFLAGS)
 
 prepare:
 	mkdir -p out
