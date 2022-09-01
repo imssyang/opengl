@@ -1,3 +1,10 @@
 {
-    "svn.ignoreMissingSvnWarning": true
+    "svn.ignoreMissingSvnWarning": true,
+    "files.associations": {
+        "cmath": "cpp",
+        "ctime": "cpp",
+        "iostream": "cpp",
+        "sstream": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }

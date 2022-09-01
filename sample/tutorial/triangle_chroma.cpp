@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <iostream>
 #include <glad/glad.h>
@@ -51,11 +52,14 @@ int main()
     char infoLog[512];
 
     // gl: build vertex shader
-    const char *vertexShaderSource = "#version 330 core\n"
+    const char *vertexShaderSource ="#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
+        "layout (location = 1) in vec3 aColor;\n"
+        "out vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "   gl_Position = vec4(aPos, 1.0);\n"
+        "   ourColor = aColor;\n"
         "}\0";
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -69,9 +73,10 @@ int main()
     // gl: build fragment shader
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "in vec3 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "   FragColor = vec4(ourColor, 1.0f);\n"
         "}\n\0";
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -97,9 +102,10 @@ int main()
 
     // gl: set up vertex data (and buffer(s)) and configure vertex attributes
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left
-         0.5f, -0.5f, 0.0f, // right
-         0.0f,  0.5f, 0.0f  // top
+        // positions         // colors
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // bottom left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f   // top
     };
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -108,10 +114,15 @@ int main()
     glBindVertexArray(VAO); // bind Vertex Array Object
     glBindBuffer(GL_ARRAY_BUFFER, VBO); // bind Vertex Buffer Object
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // set Vertex Buffer Object
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); // config vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0); // config vertex position attributes
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float))); // config vertex color attributes
+    glEnableVertexAttribArray(1);
     //glBindBuffer(GL_ARRAY_BUFFER, 0); // (options) unbind the VBO so afterwards we can safely unbind VAO
     //glBindVertexArray(0); // (options) unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO.
+
+    // gl: just activate our shader once beforehand for single shader
+    glUseProgram(shaderProgram);
 
     // glfw: render loop
     int render_count = 0;
@@ -123,9 +134,7 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // gl: draw triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // (options) no need to bind it every time for single VAO, but we'll do so to keep things a bit more organized
+        //glBindVertexArray(VAO); // (options) no need to bind it every time for single VAO
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //glBindVertexArray(0); // (options) no need to unbind it every time
 

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <ctime>
 #include <iostream>
 #include <glad/glad.h>
@@ -55,7 +56,7 @@ int main()
         "layout (location = 0) in vec3 aPos;\n"
         "void main()\n"
         "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+        "   gl_Position = vec4(aPos, 1.0);\n"
         "}\0";
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -69,9 +70,10 @@ int main()
     // gl: build fragment shader
     const char *fragmentShaderSource = "#version 330 core\n"
         "out vec4 FragColor;\n"
+        "uniform vec4 ourColor;\n"
         "void main()\n"
         "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+        "   FragColor = ourColor;\n"
         "}\n\0";
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
     glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
@@ -125,7 +127,13 @@ int main()
 
         // gl: draw triangle
         glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // (options) no need to bind it every time for single VAO, but we'll do so to keep things a bit more organized
+
+        // gl: update shader uniform
+        double timeValue = glfwGetTime();
+        float greenValue = static_cast<float>(sin(timeValue) / 2.0 + 0.5);
+        int vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+        //glBindVertexArray(VAO); // (options) no need to bind it every time for single VAO
         glDrawArrays(GL_TRIANGLES, 0, 3);
         //glBindVertexArray(0); // (options) no need to unbind it every time
 
