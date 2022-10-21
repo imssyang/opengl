@@ -7,7 +7,7 @@
                 "/opt/opengl/include"
             ],
             "defines": [],
-            "compilerPath": "/opt/llvm/bin/clang",
+            "compilerPath": "/opt/clang/bin/clang",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64"

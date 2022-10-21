@@ -1,122 +1,132 @@
 #pragma once
 
-#include <fstream>
 #include <iostream>
-#include <sstream>
-#include <string>
+#include <typeinfo>
 #include <vector>
 #include <glad/glad.h>
 
-class GLShader
+class GLShaders
 {
 public:
-    GLShader(const char* vertexPath, const char* fragmentPath) {
-        // 1. retrieve the vertex/fragment source code from filePath
-        std::string vertexCode;
-        std::string fragmentCode;
-        std::ifstream vShaderFile;
-        std::ifstream fShaderFile;
-        // ensure ifstream objects can throw exceptions:
-        vShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        fShaderFile.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        try 
-        {
-            // open files
-            vShaderFile.open(vertexPath);
-            fShaderFile.open(fragmentPath);
-            std::stringstream vShaderStream, fShaderStream;
-            // read file's buffer contents into streams
-            vShaderStream << vShaderFile.rdbuf();
-            fShaderStream << fShaderFile.rdbuf();
-            // close file handlers
-            vShaderFile.close();
-            fShaderFile.close();
-            // convert stream into string
-            vertexCode   = vShaderStream.str();
-            fragmentCode = fShaderStream.str();
-        }
-        catch (std::ifstream::failure& e)
-        {
-            std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << e.what() << std::endl;
-        }
-        const char* vShaderCode = vertexCode.c_str();
-        const char * fShaderCode = fragmentCode.c_str();
-        // 2. compile shaders
-        unsigned int vertex, fragment;
-        // vertex shader
-        vertex = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex, 1, &vShaderCode, NULL);
-        glCompileShader(vertex);
-        checkCompileErrors(vertex, "VERTEX");
-        // fragment Shader
-        fragment = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment, 1, &fShaderCode, NULL);
-        glCompileShader(fragment);
-        checkCompileErrors(fragment, "FRAGMENT");
-        // shader Program
-        ID = glCreateProgram();
-        glAttachShader(ID, vertex);
-        glAttachShader(ID, fragment);
-        glLinkProgram(ID);
-        checkCompileErrors(ID, "PROGRAM");
-        // delete the shaders as they're linked into our program now and no longer necessary
-        glDeleteShader(vertex);
-        glDeleteShader(fragment);
+    GLShaders() {
+       this->program_id = glCreateProgram();
     }
 
-    void useProgram() {
-        glUseProgram(id);
+    virtual ~GLShaders() {
+        glDeleteProgram(this->program_id);
+
+        for (auto shader_id : this->shaders) {
+            glDeleteShader(shader_id);
+        }
+    }
+
+    bool AddShader(unsigned int shader_type, const char *shader_source) {
+        unsigned int shader_id = glCreateShader(shader_type);
+        glShaderSource(shader_id, 1, &shader_source, NULL);
+        glCompileShader(shader_id);
+        if (!CheckShaderStatus(shader_id)) {
+            return false;
+        }
+        this->shaders.push_back(shader_id);
+        return true;
+    }
+
+    bool CompileProgram() {
+        for (auto shader_id : this->shaders)
+            glAttachShader(this->program_id, shader_id);
+
+        glLinkProgram(this->program_id);
+        return CheckProgramStatus(this->program_id);
+    }
+
+    void UseProgram() {
+        glUseProgram(this->program_id);
     }
 
     template<typename T>
-    void setUniform(const std::string &name, vector<T> values) {
+    void setUniform(const char *name, std::vector<T> values) {
+        int location = glGetUniformLocation(this->program_id, name.data());
         switch (values.size()) {
         case 1:
+            if (typeid(T) == typeid(int))
+                glUniform1i(location, values[0]);
+            elif (typeid(T) == typeid(unsigned int))
+                glUniform1ui(location, values[0]);
+            elif (typeid(T) == typeid(float))
+                glUniform1f(location, values[0]);
+            elif (typeid(T) == typeid(double))
+                glUniform1d(location, values[0]);
+            else
+                std::cout << "[1]: Unsupported type of value!" << std::endl;
             break;
         case 2:
+            if (typeid(T) == typeid(int))
+                glUniform2i(location, values[0], values[1]);
+            elif (typeid(T) == typeid(unsigned int))
+                glUniform2ui(location, values[0], values[1]);
+            elif (typeid(T) == typeid(float))
+                glUniform2f(location, values[0], values[1]);
+            elif (typeid(T) == typeid(double))
+                glUniform2d(location, values[0], values[1]);
+            else
+                std::cout << "[2]: Unsupported type of value!" << std::endl;
             break;
         case 3:
+            if (typeid(T) == typeid(int))
+                glUniform3i(location, values[0], values[1], values[2]);
+            elif (typeid(T) == typeid(unsigned int))
+                glUniform3ui(location, values[0], values[1], values[2]);
+            elif (typeid(T) == typeid(float))
+                glUniform3f(location, values[0], values[1], values[2]);
+            elif (typeid(T) == typeid(double))
+                glUniform3d(location, values[0], values[1], values[2]);
+            else
+                std::cout << "[3]: Unsupported type of value!" << std::endl;
             break;
         case 4:
+            if (typeid(T) == typeid(int))
+                glUniform4i(location, values[0], values[1], values[2], values[3]);
+            elif (typeid(T) == typeid(unsigned int))
+                glUniform4ui(location, values[0], values[1], values[2], values[3]);
+            elif (typeid(T) == typeid(float))
+                glUniform4f(location, values[0], values[1], values[2], values[3]);
+            elif (typeid(T) == typeid(double))
+                glUniform4d(location, values[0], values[1], values[2], values[3]);
+            else
+                std::cout << "[4]: Unsupported type of value!" << std::endl;
             break;
         default:
+            std::cout << "Unsupported size of values!" << std::endl;
             break;
         }
     }
 
-    // utility uniform functions
-    // ------------------------------------------------------------------------
-    void setBool(const std::string &name, bool value) const {
-        glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
-    }
-
-    void setInt(const std::string &name, int value) const {
-        glUniform1i(glGetUniformLocation(id, name.c_str()), value);
-    }
-
-    void setFloat(const std::string &name, float value) const {
-        glUniform1f(glGetUniformLocation(id, name.c_str()), value);
-    }
-
 private:
-    void checkCompileErrors(unsigned int shader, std::string type) {
+    bool CheckShaderStatus(unsigned int shader_id) {
         int success;
-        char infoLog[1024];
-        if (type != "PROGRAM") {
-            glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-            if (!success) {
-                glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type[" << type << "]: " << infoLog << std::endl;
-            }
-        } else {
-            glGetProgramiv(shader, GL_LINK_STATUS, &success);
-            if (!success) {
-                glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type[" << type << "]: " << infoLog << std::endl;
-            }
+        glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
+        if (!success) {
+            char errdesc[1024];
+            glGetShaderInfoLog(shader_id, 1024, NULL, errdesc);
+            std::cout << "SHADER_COMPILATION_ERROR: " << errdesc << std::endl;
+            return false;
         }
+        return true;
+    }
+
+    bool CheckProgramStatus(unsigned int program_id) {
+        int success;
+        glGetProgramiv(program_id, GL_LINK_STATUS, &success);
+        if (!success) {
+            char errdesc[1024];
+            glGetProgramInfoLog(program_id, 1024, NULL, errdesc);
+            std::cout << "PROGRAM_LINKING_ERROR: " << errdesc << std::endl;
+            return false;
+        }
+        return true;
     }
 
 private:
-    unsigned int id;
+    unsigned int program_id;
+    std::vector<unsigned int> shaders;
 };
