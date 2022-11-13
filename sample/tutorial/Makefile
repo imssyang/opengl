@@ -16,6 +16,9 @@ triangle_color: prepare
 triangle_two: prepare
 	$(CC) -o out/triangle_two triangle_two.cpp $(CFLAGS) $(LDFLAGS)
 
+triangle_main: prepare
+	$(CC) -o out/triangle_main triangle_main.cpp $(CFLAGS) $(LDFLAGS)
+
 rectangle: prepare
 	$(CC) -o out/rectangle rectangle.cpp $(CFLAGS) $(LDFLAGS)
 

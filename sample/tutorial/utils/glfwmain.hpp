@@ -2,6 +2,7 @@
 
 #include <ctime>
 #include <iostream>
+#include <map>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -43,7 +44,7 @@ public:
 
 private:
     static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height) {
-        OnWindowSizeChange(window, width, height);
+        win2this[window]->OnWindowSizeChange(window, width, height);
     }
 
     bool InitWindow(int width, int height) {
@@ -55,6 +56,7 @@ private:
         }
         glfwMakeContextCurrent(this->window);
         glfwSetFramebufferSizeCallback(this->window, FrameBufferSizeCallback);
+        win2this.insert(std::pair<GLFWwindow*, GLFWMain*>(this->window, this));
         return true;
     }
 
@@ -76,6 +78,9 @@ private:
     }
 
 private:
+    static std::map<GLFWwindow*, GLFWMain*> win2this;
     GLFWwindow* window;
     int render_count;
 };
+
+std::map<GLFWwindow*, GLFWMain*> GLFWMain::win2this;

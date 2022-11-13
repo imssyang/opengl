@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <typeinfo>
 #include <vector>
 #include <glad/glad.h>
@@ -44,17 +45,17 @@ public:
     }
 
     template<typename T>
-    void setUniform(const char *name, std::vector<T> values) {
+    void SetUniform(const std::string& name, std::vector<T> values) {
         int location = glGetUniformLocation(this->program_id, name.data());
         switch (values.size()) {
         case 1:
             if (typeid(T) == typeid(int))
                 glUniform1i(location, values[0]);
-            elif (typeid(T) == typeid(unsigned int))
+            else if (typeid(T) == typeid(unsigned int))
                 glUniform1ui(location, values[0]);
-            elif (typeid(T) == typeid(float))
+            else if (typeid(T) == typeid(float))
                 glUniform1f(location, values[0]);
-            elif (typeid(T) == typeid(double))
+            else if (typeid(T) == typeid(double))
                 glUniform1d(location, values[0]);
             else
                 std::cout << "[1]: Unsupported type of value!" << std::endl;
@@ -62,11 +63,11 @@ public:
         case 2:
             if (typeid(T) == typeid(int))
                 glUniform2i(location, values[0], values[1]);
-            elif (typeid(T) == typeid(unsigned int))
+            else if (typeid(T) == typeid(unsigned int))
                 glUniform2ui(location, values[0], values[1]);
-            elif (typeid(T) == typeid(float))
+            else if (typeid(T) == typeid(float))
                 glUniform2f(location, values[0], values[1]);
-            elif (typeid(T) == typeid(double))
+            else if (typeid(T) == typeid(double))
                 glUniform2d(location, values[0], values[1]);
             else
                 std::cout << "[2]: Unsupported type of value!" << std::endl;
@@ -74,11 +75,11 @@ public:
         case 3:
             if (typeid(T) == typeid(int))
                 glUniform3i(location, values[0], values[1], values[2]);
-            elif (typeid(T) == typeid(unsigned int))
+            else if (typeid(T) == typeid(unsigned int))
                 glUniform3ui(location, values[0], values[1], values[2]);
-            elif (typeid(T) == typeid(float))
+            else if (typeid(T) == typeid(float))
                 glUniform3f(location, values[0], values[1], values[2]);
-            elif (typeid(T) == typeid(double))
+            else if (typeid(T) == typeid(double))
                 glUniform3d(location, values[0], values[1], values[2]);
             else
                 std::cout << "[3]: Unsupported type of value!" << std::endl;
@@ -86,11 +87,11 @@ public:
         case 4:
             if (typeid(T) == typeid(int))
                 glUniform4i(location, values[0], values[1], values[2], values[3]);
-            elif (typeid(T) == typeid(unsigned int))
+            else if (typeid(T) == typeid(unsigned int))
                 glUniform4ui(location, values[0], values[1], values[2], values[3]);
-            elif (typeid(T) == typeid(float))
+            else if (typeid(T) == typeid(float))
                 glUniform4f(location, values[0], values[1], values[2], values[3]);
-            elif (typeid(T) == typeid(double))
+            else if (typeid(T) == typeid(double))
                 glUniform4d(location, values[0], values[1], values[2], values[3]);
             else
                 std::cout << "[4]: Unsupported type of value!" << std::endl;
